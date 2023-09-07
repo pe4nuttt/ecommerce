@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const shopModel = require('../models/shop.model');
 const KeyTokenService = require('../services/keyToken.service');
-const { createTokenPair } = require('../utils/authUtils');
+const { createTokenPair } = require('../auth/authUtils');
 const { getInfoData } = require('../utils');
 
 const RoleShop = {
