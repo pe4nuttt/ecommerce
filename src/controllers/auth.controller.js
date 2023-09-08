@@ -1,15 +1,20 @@
 'use strict';
 const AccessService = require('../services/auth.service');
+const catchAsync = require('../utils/catchAsync');
+const { OkResponse, CreatedResponse } = require('../core/success.response');
 
 class AccessController {
-  async signUp(req, res, next) {
+  signUp = catchAsync(async (req, res, next) => {
     try {
       console.log('');
-      return res.status(201).json(await AccessService.signUp(req.body));
+      new CreatedResponse({
+        message: 'Registed Successfully!',
+        data: await AccessService.signUp(req.body),
+      }).send(res);
     } catch (err) {
       next(err);
     }
-  }
+  });
 }
 
 module.exports = new AccessController();

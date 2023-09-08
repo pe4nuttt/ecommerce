@@ -26,5 +26,14 @@ const { checkOverload } = require('./helpers/check.connect');
 app.use('/', require('./routes'));
 
 // Handling Router
+app.use((err, req, res, next) => {
+  const statusCode = err.status;
+
+  return res.status(statusCode).json({
+    status: 'error',
+    code: statusCode,
+    message: err.message || 'Internal Server Error',
+  });
+});
 
 module.exports = app;
