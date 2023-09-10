@@ -2,10 +2,7 @@
 
 const { findApiKey } = require('../services/apiKey.service');
 
-const HEADER = {
-  API_KEY: 'x-api-key',
-  AUTHORIZATION: 'authorization',
-};
+const HEADER = require('../utils/constants/header');
 
 const checkApiKey = async (req, res, next) => {
   try {

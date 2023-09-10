@@ -1,6 +1,7 @@
 'use strict';
 
 const JWT = require('jsonwebtoken');
+const catchAsync = require('../utils/catchAsync');
 
 const createTokenPair = async (payload, publicKey, privateKey) => {
   try {
@@ -27,6 +28,8 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
     return { accessToken, refreshToken };
   } catch (err) {}
 };
+
+const authenticateToken = catchAsync(async (req, res, next) => {});
 
 module.exports = {
   createTokenPair,
