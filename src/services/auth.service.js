@@ -68,7 +68,7 @@ class AccessService {
     };
   };
 
-  static signUp = async ({ name, email, password }) => {
+  static signup = async ({ name, email, password }) => {
     // Step 1: Check email existed or not
     const shop = await shopModel.findOne({ email }).lean();
     if (shop) {
@@ -142,6 +142,12 @@ class AccessService {
       code: 200,
       data: null,
     };
+  };
+
+  static logout = async keyStore => {
+    const delKey = KeyTokenService.removeKeyById(keyStore._id);
+    console.log('Log out and delete key:', delKey);
+    return delKey;
   };
 }
 

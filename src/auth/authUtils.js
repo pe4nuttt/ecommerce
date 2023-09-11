@@ -1,7 +1,12 @@
 'use strict';
 
+const { Types } = require('mongoose');
 const JWT = require('jsonwebtoken');
+const { promisify } = require('util');
 const catchAsync = require('../utils/catchAsync');
+const HEADER = require('../utils/constants/header');
+const { NotFoundError, AuthFailureError } = require('../core/error.response');
+const KeyTokenService = require('../services/keyToken.service');
 
 const createTokenPair = async (payload, publicKey, privateKey) => {
   try {
@@ -29,8 +34,37 @@ const createTokenPair = async (payload, publicKey, privateKey) => {
   } catch (err) {}
 };
 
-const authenticateToken = catchAsync(async (req, res, next) => {});
+const authenticate = catchAsync(async (req, res, next) => {
+  // 1. Getting token and userId and checking if it existed
+  // 2. Verify token
+  // 3. Check if user/shop still exist or not
+  // 4. Check keyStore existed with userId
+  // 5. Check if user/shop changed password after the JWT was issued
+
+  const userId = req.headers[HEADER.CLIENT_ID];
+  if (!userId) throw new AuthFailureError('Invalid Request');
+
+  const keyStore = await KeyTokenService.findByUserId(userId);
+  if (!keyStore) throw new NotFoundError('Not found keyStore');
+
+  const accessToken = req.headers[HEADER.AUTHORIZATION].split(' ')[1];
+  if (!accessToken) throw new AuthFailureError('Invalid Request');
+
+  try {
+    const decoded = await promisify(JWT.verify)(
+      accessToken,
+      keyStore.publicKey,
+    );
+    if (userId !== decoded.userId) throw new AuthFailureError('Invalid userId');
+    req.keyStore = keyStore;
+
+    return next();
+  } catch (err) {
+    throw err;
+  }
+});
 
 module.exports = {
   createTokenPair,
+  authenticate,
 };

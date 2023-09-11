@@ -1,5 +1,5 @@
 'use strict';
-const AccessService = require('../services/auth.service');
+const AuthService = require('../services/auth.service');
 const catchAsync = require('../utils/catchAsync');
 const {
   OkResponse,
@@ -8,15 +8,22 @@ const {
 } = require('../core/success.response');
 
 class AccessController {
-  signUp = catchAsync(async (req, res, next) => {
+  signup = catchAsync(async (req, res, next) => {
     new CreatedResponse({
       message: 'Registed Successfully!',
-      data: await AccessService.signUp(req.body),
+      data: await AuthService.signup(req.body),
     }).send(res);
   });
 
   login = catchAsync(async (req, res, next) => {
-    new SuccessReponse({ data: await AccessService.login(req.body) }).send(res);
+    new SuccessReponse({ data: await AuthService.login(req.body) }).send(res);
+  });
+
+  logout = catchAsync(async (req, res, next) => {
+    new SuccessReponse({
+      message: 'Logout successfully!',
+      data: await AuthService.logout(req.keyStore),
+    }).send(res);
   });
 }
 
