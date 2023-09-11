@@ -4,9 +4,14 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const shopModel = require('../models/shop.model');
 const KeyTokenService = require('../services/keyToken.service');
-const { createTokenPair } = require('../auth/authUtils');
+const ShopService = require('../services/shop.service');
+const { createTokenPair, verifyJWT } = require('../auth/authUtils');
 const { getInfoData } = require('../utils');
-const { BadRequestError, AuthFailureError } = require('../core/error.response');
+const {
+  BadRequestError,
+  AuthFailureError,
+  ForbiddenError,
+} = require('../core/error.response');
 const { findByEmail } = require('./shop.service');
 const catchAsync = require('../utils/catchAsync');
 
@@ -25,6 +30,63 @@ const createPrivatePublicKeys = () => {
 };
 
 class AccessService {
+  static handleRefreshToken = async refreshToken => {
+    // 1. Check this token was used or not
+    const usedToken = await KeyTokenService.findByRefreshTokenUsed(
+      refreshToken,
+    );
+    if (usedToken) {
+      // If token used -> delete keyStore which has this token
+      const { userId, email } = await verifyJWT(
+        refreshToken,
+        usedToken.privateKey,
+      );
+      console.log('Token was used with data:', userId, email);
+
+      await KeyTokenService.deleteKeyByUserId(userId);
+      throw new ForbiddenError('Something went wrong! Please login again.');
+    }
+
+    // 2. Check refreshToken exist
+    const keyToken = await KeyTokenService.findByRefreshToken(refreshToken);
+    if (!keyToken) throw new AuthFailureError('Shop not registerd!');
+
+    // 3. Verify refreshToken
+    const { userId, email } = await verifyJWT(
+      refreshToken,
+      keyToken.privateKey,
+    );
+
+    // 4. Check userId existed
+    const shop = await ShopService.findByEmail({ email });
+    if (!shop) throw new AuthFailureError('Shop not registerd!');
+
+    // 5. Update refresh & access tokens
+    const tokens = await createTokenPair(
+      { userId, email },
+      keyToken.publicKey,
+      keyToken.privateKey,
+    );
+
+    // await keyToken.update({
+    //   $set: {
+    //     refreshToken: tokens.refreshToken,
+    //   },
+    //   $addToSet: {
+    //     refreshTokensUsed: refreshToken,
+    //   },
+    // });
+
+    keyToken.refreshToken = tokens.refreshToken;
+    keyToken.refreshTokensUsed.push(refreshToken);
+    await keyToken.save();
+
+    return {
+      user: { userId, email },
+      tokens,
+    };
+  };
+
   static login = async ({ email, password, refreshToken = null }) => {
     // 1. Check if email and password exist
 

@@ -14,7 +14,6 @@ const findByEmail = async ({
 }) => {
   return await shopModel.findOne({ email }).select(select).lean();
 };
-
 module.exports = {
   findByEmail,
 };

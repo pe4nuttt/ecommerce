@@ -8,6 +8,13 @@ const {
 } = require('../core/success.response');
 
 class AccessController {
+  handleRefreshToken = catchAsync(async (req, res, next) => {
+    new SuccessReponse({
+      message: 'Get token successfully!',
+      data: await AuthService.handleRefreshToken(req.body.refreshToken),
+    }).send(res);
+  });
+
   signup = catchAsync(async (req, res, next) => {
     new CreatedResponse({
       message: 'Registed Successfully!',

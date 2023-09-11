@@ -64,7 +64,12 @@ const authenticate = catchAsync(async (req, res, next) => {
   }
 });
 
+const verifyJWT = async (token, key) => {
+  return JWT.verify(token, key);
+};
+
 module.exports = {
   createTokenPair,
   authenticate,
+  verifyJWT,
 };
