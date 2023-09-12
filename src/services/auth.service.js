@@ -30,6 +30,40 @@ const createPrivatePublicKeys = () => {
 };
 
 class AccessService {
+  static handleRefreshTokenV2 = async ({ keyStore, user, refreshToken }) => {
+    const { userId, email } = user;
+
+    // 1. Check this token was used or not
+    if (keyStore.refreshTokensUsed.includes(refreshToken)) {
+      await KeyTokenService.deleteKeyByUserId(userId);
+      throw new ForbiddenError('Something went wrong! Please login again.');
+    }
+
+    // 2. Check refreshToken exist
+    if (refreshToken !== keyStore.refreshToken)
+      throw new AuthFailureError('Shop not registerd!');
+
+    // 3. Check userId existed
+    const shop = await ShopService.findByEmail({ email });
+    if (!shop) throw new AuthFailureError('Shop not registerd!');
+
+    // 4. Update refresh & access tokens
+    const tokens = await createTokenPair(
+      { userId, email },
+      keyStore.publicKey,
+      keyStore.privateKey,
+    );
+
+    keyStore.refreshToken = tokens.refreshToken;
+    keyStore.refreshTokensUsed.push(refreshToken);
+    await keyStore.save();
+
+    return {
+      user: { userId, email },
+      tokens,
+    };
+  };
+
   static handleRefreshToken = async refreshToken => {
     // 1. Check this token was used or not
     const usedToken = await KeyTokenService.findByRefreshTokenUsed(

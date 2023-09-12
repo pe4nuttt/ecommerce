@@ -9,9 +9,20 @@ const {
 
 class AccessController {
   handleRefreshToken = catchAsync(async (req, res, next) => {
+    // VERSION 1
+    // new SuccessReponse({
+    //   message: 'Get token successfully!',
+    //   data: await AuthService.handleRefreshToken(req.body.refreshToken),
+    // }).send(res);
+
+    // VERSION 2
     new SuccessReponse({
       message: 'Get token successfully!',
-      data: await AuthService.handleRefreshToken(req.body.refreshToken),
+      data: await AuthService.handleRefreshTokenV2({
+        keyStore: req.keyStore,
+        user: req.user,
+        refreshToken: req.refreshToken,
+      }),
     }).send(res);
   });
 
