@@ -61,7 +61,7 @@ const clothingSchema = new Schema(
   },
 );
 
-const electronicSchema = new Schema(
+const electronicsSchema = new Schema(
   {
     manufactor: {
       type: String,
@@ -76,8 +76,8 @@ const electronicSchema = new Schema(
   },
 );
 
-modules.export = {
+module.exports = {
   product: model(DOCUMENT_NAME, productSchema),
   clothing: model('Clothing', clothingSchema),
-  electronic: model('Electronic', electronicSchema),
+  electronics: model('Electronics', electronicsSchema),
 };

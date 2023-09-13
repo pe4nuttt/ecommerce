@@ -11,5 +11,6 @@ router.use(checkApiKey);
 router.use(checkPermission('0000'));
 
 router.use('/api/v1', require('./auth'));
+router.use('/api/v1/product', require('./product'));
 
 module.exports = router;
