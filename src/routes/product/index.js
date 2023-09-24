@@ -10,5 +10,8 @@ router.use(authenticateV2);
 
 // logout
 router.post('', productController.createProduct);
+router.post('/publish/:id', productController.publishProductByShop);
+router.get('/drafts/all', productController.getAllDraftsForShop);
+router.get('/published/all', productController.getAllPublishForShop);
 
 module.exports = router;

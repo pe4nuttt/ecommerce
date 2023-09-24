@@ -27,6 +27,34 @@ class ProductController {
       }),
     }).send(res);
   });
+
+  getAllDraftsForShop = catchAsync(async (req, res, next) => {
+    new SuccessReponse({
+      message: 'Get draft product list successfully!',
+      data: await ProductServiceV2.findAllDraftsForShop({
+        product_shop: req.user.userId,
+      }),
+    }).send(res);
+  });
+
+  getAllPublishForShop = catchAsync(async (req, res, next) => {
+    new SuccessReponse({
+      message: 'Get published product list successfully!',
+      data: await ProductServiceV2.findAllPublishForShop({
+        product_shop: req.user.userId,
+      }),
+    }).send(res);
+  });
+
+  publishProductByShop = catchAsync(async (req, res, next) => {
+    new SuccessReponse({
+      message: 'Publish product successfully!',
+      data: await ProductServiceV2.publishProductByShop({
+        product_shop: req.user.userId,
+        product_id: req.params.id,
+      }),
+    }).send(res);
+  });
 }
 
 module.exports = new ProductController();
