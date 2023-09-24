@@ -55,6 +55,39 @@ class ProductController {
       }),
     }).send(res);
   });
+
+  unPublishProductByShop = catchAsync(async (req, res, next) => {
+    new SuccessReponse({
+      message: 'Unpublish product successfully!',
+      data: await ProductServiceV2.unPublishProductByShop({
+        product_shop: req.user.userId,
+        product_id: req.params.id,
+      }),
+    }).send(res);
+  });
+
+  getListSearchProduct = catchAsync(async (req, res, next) => {
+    new SuccessReponse({
+      message: 'Get products successfully!',
+      data: await ProductServiceV2.searchProducts(req.params),
+    }).send(res);
+  });
+
+  findAllProducts = catchAsync(async (req, res, next) => {
+    new SuccessReponse({
+      message: 'Get products successfully!',
+      data: await ProductServiceV2.findAllProducts(req.query),
+    }).send(res);
+  });
+
+  findProduct = catchAsync(async (req, res, next) => {
+    new SuccessReponse({
+      message: 'Get product successfully!',
+      data: await ProductServiceV2.findProduct({
+        product_id: req.params.product_id,
+      }),
+    }).send(res);
+  });
 }
 
 module.exports = new ProductController();
