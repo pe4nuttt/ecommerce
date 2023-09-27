@@ -99,6 +99,25 @@ const findProduct = async ({ product_id, select = '-__v' }) => {
   return await product.findById(product_id).select(select);
 };
 
+const updateProductById = async ({
+  productShop,
+  productId,
+  model,
+  bodyUpdate,
+  isNew = true,
+}) => {
+  return await model.findOneAndUpdate(
+    {
+      product_shop: new Types.ObjectId(productShop),
+      _id: new Types.ObjectId(productId),
+    },
+    bodyUpdate,
+    {
+      new: isNew,
+    },
+  );
+};
+
 module.exports = {
   findAllDraftsForShop,
   publishProductByShop,
@@ -107,4 +126,5 @@ module.exports = {
   findAllProducts,
   searchProductByText,
   findProduct,
+  updateProductById,
 };

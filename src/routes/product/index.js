@@ -14,6 +14,7 @@ router.use(authenticateV2);
 
 // logout
 router.post('', productController.createProduct);
+router.patch('/:product_id', productController.updateProduct);
 router.post('/publish', productController.createProduct);
 router.post('/publish/:id', productController.publishProductByShop);
 router.post('/unpublish/:id', productController.unPublishProductByShop);

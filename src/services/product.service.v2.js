@@ -15,7 +15,10 @@ const {
   findAllProducts,
   searchProductByText,
   findProduct,
+  updateProductById,
 } = require('../models/repositories/product.repo');
+const { insertInventory } = require('../models/repositories/inventory.repo');
+const { removeEmptyValObject } = require('../utils');
 
 // Define Factory class to create product
 
@@ -40,6 +43,17 @@ class ProductFactory {
     //   default:
     //     throw new BadRequestError(`Ivalid Product Type ${type}`);
     // }
+  }
+
+  static async updateProduct(type, { product_shop, product_id }, payload) {
+    const productClass = ProductFactory.productRegistry[type];
+    if (!productClass)
+      throw new BadRequestError(`Invalid product types ${type}`);
+
+    return new productClass(payload).updateProduct({
+      product_shop,
+      product_id,
+    });
   }
 
   static async publishProductByShop({ product_shop, product_id }) {
@@ -125,7 +139,26 @@ class Product {
   }
 
   async createProduct(product_id) {
-    return await product.create({ ...this, _id: product_id });
+    const newProduct = await product.create({ ...this, _id: product_id });
+
+    if (newProduct) {
+      insertInventory({
+        productId: newProduct._id,
+        shopId: this.product_shop,
+        stock: this.product_quantity,
+      });
+    }
+
+    return newProduct;
+  }
+
+  async updateProduct({ product_shop, product_id, bodyUpdate }) {
+    return await updateProductById({
+      productShop: product_shop,
+      productId: product_id,
+      model: product,
+      bodyUpdate,
+    });
   }
 }
 
@@ -143,6 +176,35 @@ class Clothing extends Product {
     if (!newProduct) throw new BadRequestError('Create new product error!');
 
     return newProduct;
+  }
+
+  async updateProduct({ product_shop, product_id }) {
+    // 1. Remove attributes have null or undefined value
+    console.log('[1]::', this);
+    const objectParams = removeEmptyValObject(this);
+    console.log('[2]::', objectParams);
+
+    // 2. Check if update both Clothing and Product or not
+    if (objectParams.product_attributes) {
+      await updateProductById({
+        productShop: product_shop,
+        productId: product_id,
+        model: clothing,
+        bodyUpdate: objectParams.product_attributes,
+      });
+    }
+
+    const updatedProduct = await super.updateProduct({
+      product_shop,
+      product_id,
+      bodyUpdate: objectParams,
+    });
+
+    if (!updatedProduct) {
+      throw new BadRequestError('Update product failed!');
+    }
+
+    return updatedProduct;
   }
 }
 

@@ -28,6 +28,21 @@ class ProductController {
     }).send(res);
   });
 
+  updateProduct = catchAsync(async (req, res, next) => {
+    console.log('user:', req.user);
+    new SuccessReponse({
+      message: 'Update product successfully!',
+      data: await ProductServiceV2.updateProduct(
+        req.body.product_type,
+        {
+          product_shop: req.user.userId,
+          product_id: req.params.product_id,
+        },
+        req.body,
+      ),
+    }).send(res);
+  });
+
   getAllDraftsForShop = catchAsync(async (req, res, next) => {
     new SuccessReponse({
       message: 'Get draft product list successfully!',

@@ -72,6 +72,12 @@ productSchema.pre('save', function (next) {
   next();
 });
 
+productSchema.pre('findOneAndUpdate', function (next) {
+  const data = this.getUpdate();
+  this.set({ product_slug: slugify(data.product_name, { lower: true }) });
+  next();
+});
+
 const clothingSchema = new Schema(
   {
     brand: {
