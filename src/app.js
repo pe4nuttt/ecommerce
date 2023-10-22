@@ -3,7 +3,33 @@ const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const compression = require('compression');
+
+// Swagger Config
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Hello World',
+      version: '1.0.0',
+    },
+    servers: [
+      {
+        url: 'http://localhost:3052',
+      },
+    ],
+  },
+  apis: ['./routes/*.js'],
+};
+
+const swaggerSpec = swaggerJSDoc(options);
+
 const app = express();
+
+// Swagger
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Init Middleware
 app.use(morgan('dev'));
@@ -19,7 +45,6 @@ app.use(
 // Init DB
 require('./dbs/init.mongoDB');
 const { checkOverload } = require('./helpers/check.connect');
-
 // checkOverload();
 
 // Init Route

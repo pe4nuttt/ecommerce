@@ -21,10 +21,15 @@ const discountSchema = new mongoose.Schema(
       default: 'fixed_amount',
       enum: ['fixed_amount', 'percentage'],
     },
-    discount_amount: {
+    discount_value: {
       type: Number,
       required: true,
     },
+    discount_max_value: {
+      type: Number,
+      required: true,
+    },
+
     discount_code: {
       type: String,
       required: true,
@@ -42,7 +47,7 @@ const discountSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    discount_uses_count: {
+    discount_used_count: {
       // So discount da su dung
       type: Number,
       required: true,
