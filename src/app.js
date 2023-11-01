@@ -3,6 +3,7 @@ const express = require('express');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const compression = require('compression');
+const path = require('path');
 
 // Swagger Config
 const swaggerJSDoc = require('swagger-jsdoc');
@@ -21,7 +22,11 @@ const options = {
       },
     ],
   },
-  apis: ['./routes/*.js'],
+  apis: [
+    path.join(__dirname, 'routes/*.js'),
+    // path.resolve(__dirname, 'routes/**/*.js'),
+  ],
+  // apis: [`src/routes/*.js`, `src/routes/**/*.js`],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
@@ -29,7 +34,11 @@ const swaggerSpec = swaggerJSDoc(options);
 const app = express();
 
 // Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use(
+  '/api-docs',
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, { explorer: true }),
+);
 
 // Init Middleware
 app.use(morgan('dev'));

@@ -18,7 +18,7 @@ const {
   updateProductById,
 } = require('../models/repositories/product.repo');
 const { insertInventory } = require('../models/repositories/inventory.repo');
-const { removeEmptyValObject } = require('../utils');
+const { removeEmptyValObject, convertToObjectIdMongodb } = require('../utils');
 
 // Define Factory class to create product
 
@@ -103,7 +103,12 @@ class ProductFactory {
       sort,
       page,
       filter,
-      select: ['product_name', 'product_price', 'product_thumb'],
+      select: [
+        'product_name',
+        'product_price',
+        'product_thumb',
+        'product_shop',
+      ],
     });
   }
 
@@ -134,7 +139,7 @@ class Product {
     this.product_price = product_price;
     this.product_quantity = product_quantity;
     this.product_type = product_type;
-    this.product_shop = product_shop;
+    this.product_shop = convertToObjectIdMongodb(product_shop);
     this.product_attributes = product_attributes;
   }
 

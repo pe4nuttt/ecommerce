@@ -1,5 +1,5 @@
 'use strict';
-import discount from '../discount.model';
+const discount = require('../discount.model');
 
 const findAllDiscountCode = async ({
   limit = 50,
@@ -22,6 +22,11 @@ const findAllDiscountCode = async ({
   return discounts;
 };
 
+const checkDiscountExists = async ({ model, filter }) => {
+  return await model.findOne(filter).lean();
+};
+
 module.exports = {
   findAllDiscountCode,
+  checkDiscountExists,
 };

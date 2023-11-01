@@ -1,3 +1,24 @@
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *   Product:
+ *      type: object
+ *      required:
+ *        - product_name
+ *        - product_thumb
+ *        - product_price
+ *        - product_quantity
+ *        - product_type
+ *        - product_attributes
+ *      properties:
+ *        product_name:
+ *          type: String
+ *          description: The name of product
+ *
+ *
+ */
+
 'use strict';
 
 const express = require('express');
