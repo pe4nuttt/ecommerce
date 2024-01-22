@@ -40,6 +40,10 @@ const searchProductByText = async ({ keySearch }) => {
   return results;
 };
 
+const getProductById = async productId => {
+  return await product.findById(productId);
+};
+
 const findAllDraftsForShop = async ({ query, limit, skip }) => {
   return await queryProduct({ query, limit, skip });
 };
@@ -127,4 +131,5 @@ module.exports = {
   searchProductByText,
   findProduct,
   updateProductById,
+  getProductById,
 };

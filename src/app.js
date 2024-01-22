@@ -51,6 +51,13 @@ app.use(
   }),
 );
 
+// TEST REDIS
+require('./tests/invetory.test');
+const productTest = require('./tests/product.test');
+setTimeout(() => {
+  productTest.purchaseProduct('001', 10);
+}, 3000);
+
 // Init DB
 require('./dbs/init.mongoDB');
 const { checkOverload } = require('./helpers/check.connect');

@@ -5,7 +5,9 @@ const {
   findCartById,
   checkProductByServer,
 } = require('../models/repositories/cart.repo');
+const { acquireLock, releaseLock } = require('./redis.service');
 const DiscountService = require('./discount.service');
+const { order } = require('../models/order.model');
 
 class CheckoutService {
   /*
@@ -111,6 +113,80 @@ class CheckoutService {
       checkout_order,
     };
   }
+
+  // ORDER
+  static async orderByUser({
+    shop_order_ids,
+    cartId,
+    userId,
+    user_address = {},
+    user_payment = {},
+  }) {
+    const { shop_order_ids_new, checkout_order } =
+      await CheckoutService.checkoutReview({
+        cartId,
+        userId,
+        shop_order_ids,
+      });
+
+    // Check if > quantity in inventory
+    // Get new array Products
+    const products = shop_order_ids_new.flatMap(order => order.item_products);
+    console.log(`[1]:`, products);
+
+    const acquireProducts = [];
+
+    for (let i = 0; i < products.length; i++) {
+      const { productId, quantity } = products[i];
+      const keyLock = await acquireLock(productId, quantity, cartId);
+      acquireProducts.push(keyLock ? true : false);
+      if (keyLock) {
+        await releaseLock(keyLock);
+      }
+    }
+
+    // If 1 product out of amount
+    if (acquireProducts.includes(false)) {
+      throw new BadRequestError(
+        'Một số sản phẩm đã được cập nhật, vui lòng quay lại giỏ hàng',
+      );
+    }
+
+    const newOrder = await order.create({
+      order_userId: userId,
+      order_checkout: checkout_order,
+      order_shipping: user_address,
+      order_payment: user_payment,
+      order_products: shop_order_ids_new,
+    });
+
+    // If insert order successfully
+    if (newOrder) {
+      // Remove product in cart
+    }
+
+    return newOrder;
+  }
+
+  /*
+    Query Orders[Users]
+  */
+  static async getOrdersByUser() {}
+
+  /*
+    Get Order Detail by id[Users]
+  */
+  static async getOrderByOrderId() {}
+
+  /*
+    Cancel order[Users]
+  */
+  static async cancelOrderByUser() {}
+
+  /*
+    Update Order Status [SHOP | ADMIN]
+  */
+  static async updateOrderStatusByShop() {}
 }
 
 module.exports = CheckoutService;

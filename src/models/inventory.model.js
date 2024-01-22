@@ -29,7 +29,7 @@ const inventoryShema = new mongoose.Schema(
      * stock: 1,
      * createdAt:
      */
-    invent_reservation: {
+    invent_reservations: {
       type: Array,
       default: [],
     },

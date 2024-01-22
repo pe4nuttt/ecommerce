@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const DOCUMENT_NAME = 'Cart';
 const COLLECTION_NAME = 'carts';
 
-const discountSchema = new mongoose.Schema(
+const cartSchema = new mongoose.Schema(
   {
     cart_state: {
       type: String,
@@ -45,5 +45,5 @@ const discountSchema = new mongoose.Schema(
 );
 
 module.exports = {
-  cart: mongoose.model(DOCUMENT_NAME, discountSchema),
+  cart: mongoose.model(DOCUMENT_NAME, cartSchema),
 };
